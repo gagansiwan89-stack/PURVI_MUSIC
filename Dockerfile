@@ -1,16 +1,20 @@
-FROM nikolaik/python-nodejs:python3.10-nodejs19
+FROM python:3.10-slim
 
-RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
-    sed -i '/security.debian.org/d' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg aria2 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# सभी जरूरी पैकेज एक साथ इंस्टॉल
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    nodejs \
+    npm \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# ऐप कॉपी करें
 COPY . /app/
 WORKDIR /app/
 
-RUN python -m pip install --no-cache-dir --upgrade pip
-RUN pip3 install --no-cache-dir --upgrade --requirement requirements.txt
+# पायथन पैकेज इंस्टॉल करें
+RUN pip install -r requirements.txt
 
+# स्टार्ट कमांड
 CMD bash start
